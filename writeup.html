@@ -1,0 +1,116 @@
+<head>
+    <title> COS426 Assignment 4 &mdash; Animation &mdash; Writeup</title>
+    <link href="css/style.css" type="text/css" rel="stylesheet"/>
+</head>
+
+<body>
+    <script src="js/student.js"> </script>
+    <script src="js/writeup.js"> </script>
+    <div class="top">
+    <div class="main_div">
+
+        <h1> <div class=assignment>COS426 Assignment 4</div>Animation &mdash; Writeup</h1>
+        <div class='selectable'>
+        <h2 id='student'></h2>
+        
+        Features Implemented:
+<ul>
+<li>(1.0) <a href='#Euler'>Euler</a></li>
+<li>(1.0) <a href='#Sphere+source'>Sphere source</a></li>
+<li>(1.0) <a href='#Animated+mesh'>Animated mesh</a></li>
+<li>(1.0) <a href='#Ground+plane'>Ground plane</a></li>
+<li>(1.0) <a href='#Axis+box'>Axis box</a></li>
+<li>(1.0) <a href='#Sphere+collision'>Sphere collision</a></li>
+<li>(2.0) <a href='#Spring+system'>Spring system</a></li>
+<li>(3.0) <a href='#Your+system'>Your system</a></li>
+<li>(1.0) <a href='#Art'>Art</a></li>
+        </ul></div>
+
+<p><hr><p><a name='Euler'></a><h2>Euler</h2><p><hr><p>
+  <a href="">
+  Attractor system:
+  </a>
+</p>
+<img src='results/euler.png'>
+
+<p><hr><p><a name='Sphere+source'></a><h2>Sphere source</h2><p><hr><p>
+  <a href="http://localhost:8000/batch.html?system=basic&texture=smoke&blending=Normal&depthTest=true&transparent=true&sorting=true&size=full">
+  Sphere source:
+  </a>
+</p>
+<img src='results/basic.png'>
+
+<p><hr><p><a name='Animated+mesh'></a><h2>Animated mesh</h2><p><hr><p>
+  <a href="">
+  Animated mesh:
+  </a>
+</p>
+<img src='results/animated.png'>
+
+<p><hr><p><a name='Ground+plane'></a><h2>Ground plane</h2><p><hr><p>
+  <a href="http://localhost:8000/batch.html?system=fountainBounce&texture=blank&blending=Normal&depthTest=true&transparent=true&sorting=true&size=full">
+  Fountain Bounce:
+  </a>
+</p>
+<img src='results/bounce.png'>
+<p>
+  <a href="http://localhost:8000/batch.html?system=fountainSink&texture=blank&blending=Normal&depthTest=true&transparent=true&sorting=true&size=full">
+  Fountain Sink:
+  </a>
+</p>
+<img src='results/sink.png'>
+
+<p><hr><p><a name='Axis+box'></a><h2>Axis box</h2><p><hr><p>
+  To see the different effects it may be necessary to change the y coordinate of the initializer sphere to be above or below the box upper boundary at y = 20. This box was set with the two points (-10, 0, -100), (10, 20, 100).
+<p>
+  <a href="http://localhost:8000/batch.html?system=box&texture=blank&blending=Normal&depthTest=true&transparent=true&sorting=true&size=full">
+  Axis box with source sphere y coordinate = 10:
+  </a>
+</p>
+<img src='results/box1.png'>
+<img src='results/box2.png'>
+<p>
+  <a href="http://localhost:8000/batch.html?system=box&texture=fire&blending=Normal&depthTest=true&transparent=true&sorting=true&size=full">
+  Axis box with source sphere y coordinate = 50:
+  </a>
+</p>
+<img src='results/box3.png'>
+
+<p><hr><p><a name='Sphere+collision'></a><h2>Sphere collision</h2><p><hr><p>
+<p>
+  <a href="http://localhost:8000/batch.html?system=cloth&texture=blank&blending=Normal&depthTest=true&transparent=true&sorting=true&size=full">
+  Sphere collision:
+  </a>
+</p>
+<img src='results/cloth.png'>
+
+<p><hr><p><a name='Spring+system'></a><h2>Spring system</h2><p><hr><p>
+<p>
+  <a href="http://localhost:8000/batch.html?system=cloth&texture=blank&blending=Normal&depthTest=true&transparent=true&sorting=true&size=full">
+  Spring system:
+  </a>
+</p>
+<img src='results/cloth.png'>
+
+<p><hr><p><a name='Your+system'></a><h2>Your system</h2><p><hr><p>
+  For my system, I added a factor to the initial velocity vector for each particle. The factor's x y z elements were each equal to sin(x) sin(y) sin(z of particle's position coordinates respectively.
+<p>
+  <a href="http://localhost:8000/batch.html?system=mySystem&texture=blank&blending=Normal&depthTest=true&transparent=true&sorting=true&size=full">
+  Submission:
+  </a>
+</p>
+<img src='results/sin.png'>
+
+<p><hr><p><a name='Art'></a><h2>Art</h2><p><hr><p>
+  For my system, I added a factor to the initial velocity vector for each particle. The factor's x y z elements were each equal to sin(x) sin(y) sin(z of particle's position coordinates respectively. It looks a bit better if you move it around...
+<p>
+  <a href="http://localhost:8000/batch.html?system=mySystem&texture=blank&blending=Normal&depthTest=true&transparent=true&sorting=true&size=full">
+  Submission:
+  </a>
+</p>
+<img src='results/sin.png'>
+
+    </div>
+    </div>
+</body>
+</html>
