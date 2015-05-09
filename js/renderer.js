@@ -48,6 +48,8 @@ Renderer.create = function( scene, canvas ) {
 
     // Create camera and setup controls
     Renderer._camera   = new THREE.PerspectiveCamera ( 55, Renderer._aspect, 0.01, 5000 );
+    // Renderer._camera   = new THREE.OrthographicCamera ( Renderer._width / - 2, Renderer._width / 2, Renderer._height / 2, Renderer._height / - 2, 1, 1000 );
+
     Renderer._controls = new THREE.TrackballControls ( Renderer._camera, Renderer._renderer.domElement );
     Renderer._camera.position.set( 0, 0, 200 );
 

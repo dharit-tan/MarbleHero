@@ -460,21 +460,7 @@ MyInitializer.prototype.initializePositions = function ( positions, toSpawn) {
 
     for ( var i = 0 ; i < toSpawn.length ; ++i ) {
         var idx = toSpawn[i];
-        // ----------- STUDENT CODE BEGIN ------------
-
-        // Sphere
-        var z = (1.0 - 2.0 * Math.random()) * r;
-        var phi = Math.random() * 2.0 * Math.PI;
-        var d = Math.sqrt(r*r - z*z);
-        var px = base.x + d * Math.cos(phi);
-        var py = base.y + d * Math.sin(phi);
-        var pz = base.z + z;
-        var pos = new THREE.Vector3( px,
-                                     py,
-                                     pz );
-
-        // ----------- STUDENT CODE END ------------
-        setElement( idx, positions, pos );
+        setElement( idx, positions, base_pos.clone() );
 
     }
     positions.needUpdate = true;

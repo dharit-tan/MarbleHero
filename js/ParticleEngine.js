@@ -115,13 +115,14 @@ function Emitter ( opts ) {
     this._cloth                = false;
     this._width                = undefined;
     this._height               = undefined;
+    // this._radius               = undefined;
     this._attributeInformation = {
         position:      3,
         velocity:      3,
         color:         4,
         size:          1,
         lifetime:      1,
-        radii:         1,
+        radius:        5,
     };
 
     // parse options
@@ -145,6 +146,8 @@ function Emitter ( opts ) {
             this._width = value;
         } else if ( option === "height" ) {
             this._height = value;
+        // } else if ( option === "radius" ) {
+        //     this._radius = value;
         } else {
             console.log( "Unknown option " + option + "! Make sure to register it!" )
         }
@@ -218,8 +221,8 @@ function Emitter ( opts ) {
     } else {
         // this._drawableParticles = new THREE.PointCloud( this._particles, this._material );
 
-        // Make particles a sphere?
-        var sphere_geo = new THREE.SphereGeometry( 5.0, 0, 100 );
+        // Make particles a sphere
+        var sphere_geo = new THREE.SphereGeometry( this._attributeInformation.radius, 100, 100 );
         var phong      = new THREE.MeshPhongMaterial( {color: 0x444444, emissive:0x442222, side: THREE.DoubleSide } );
         this._drawableParticles = new THREE.Mesh( sphere_geo, phong );
     }
@@ -272,7 +275,7 @@ Emitter.prototype.update = function( delta_t ) {
     var positions = this._particleAttributes.position;
     var pos = getElement(0, positions);
     this._drawableParticles.position.set(pos.x, pos.y, pos.z);
-    this._drawableParticles.geometry.computeBoundingSphere();
+    // this._drawableParticles.geometry.computeBoundingSphere();
 
     // particle position change each frame so we need
     if ( this._cloth === true ) {

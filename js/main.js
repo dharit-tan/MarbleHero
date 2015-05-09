@@ -36,6 +36,8 @@ Main.particleSystemChangeCallback = function ( InputSettings ) {
         cloth:         InputSettings.cloth,
         width:         InputSettings.width,
         height:        InputSettings.height,
+        // Radius of particle is in ParticleEngine this._attributeInformation 
+        //radius:        InputSettings.radius, 
     } );
 
     // If we are not dealing with cloth, lets sort particles
@@ -50,30 +52,6 @@ Main.particleSystemChangeCallback = function ( InputSettings ) {
 
     // Add the particle system
     for ( var i = 0 ; i < ParticleEngine._emitters.length ; ++i ) {
-        // var attributes = ParticleEngine.getDrawableParticles(i).geometry.attributes;
-        // var pos = attributes.position;
-
-        // for (var j = 0; j < pos.length; j++) {
-        //     var sphere_geo = new THREE.SphereGeometry( 10.0, 32, 32 );
-        //     var p = getElement( j, pos );
-        //     // console.log(sphere_geo);
-        //     // sphere_geo.boundingSphere.center = new THREE.Vector3(p.x, p.y, 0.0);
-        //     // sphere_geo.boundingSphere.center = new THREE.Vector3(100, 100, 0.0);
-        //     // sphere_geo.boundingSphere.center = new THREE.Vector3(Math.random(50), Math.random(50), 0.0);
-        //     // console.log(sphere_geo.boundingSphere.center);
-        //     var phong      = new THREE.MeshPhongMaterial( {color: 0x444444, emissive:0x442222, side: THREE.DoubleSide } );
-        //     var sphere = new THREE.Mesh( sphere_geo, phong ) 
-        //     // console.log(sphere);
-        //     // var newPos = new THREE.Vector3(100, 100, 0.0);
-        //     // var pos = sphere.geometry.position;
-        //     // setElement( j, pos, newPos);
-
-
-        //     // sphere.geometry = new THREE.Vector3(100, 100, 0.0);
-        //     // sphere.position = new THREE.Vector3(100, 100, 0.0);
-        //     Scene.addObject(sphere);
-        // }
-
         Scene.addObject( ParticleEngine.getDrawableParticles( i ) ); 
     }
 
@@ -94,6 +72,156 @@ window.onload = function() {
     Main.particleSystemChangeCallback( SystemSettings.mySystem );
 
     Renderer.create( Scene, document.getElementById("canvas") );
+    document.getElementById("canvas").addEventListener("mousedown",  mousedown);
+    document.getElementById("canvas").addEventListener("mousemove",  mousemove);
+    
+    //Interaction.start();
 
     Renderer.update();
 };
+
+//http://stackoverflow.com/questions/13055214/mouse-canvas-x-y-to-three-js-world-x-y-z 
+function getCursorPos(event){
+    
+    var vector = new THREE.Vector3();
+    // for perspective camera
+    var camera = Renderer._camera;
+    vector.set(
+        ( event.clientX / window.innerWidth ) * 2 - 1,
+        - ( event.clientY / window.innerHeight ) * 2 + 1,
+        0.5 );
+
+    vector.unproject( camera );
+    var dir = vector.sub( camera.position ).normalize();
+    var distance = - camera.position.z / dir.z;
+    var cursor_pos = camera.position.clone().add( dir.multiplyScalar( distance ) );
+    
+    // console.log(event.clientX);
+    // console.log(event.clientY);
+
+    //console.log(cursor_pos);
+    
+    return cursor_pos;
+}
+
+var plane, old_pos;
+
+var last_up = new THREE.Vector3(0,1,0);
+
+var down = false;
+
+function mousedown(event) {
+    // event.preventDefault();
+    // event.stopPropagation();
+    console.log("you pressed the mouse button");
+    var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+
+    var cursor_pos = getCursorPos(event);
+
+    var plane_geo = new THREE.PlaneBufferGeometry(30,2,10,5);//THREE.PlaneBufferGeometry( 30, 2, 10, 1 );
+    plane     = new THREE.Mesh( plane_geo, material );
+
+    //console.log("first", plane);
+    
+    plane.position.x = cursor_pos.x;
+    plane.position.y = cursor_pos.y;
+    plane.position.z = cursor_pos.z;
+
+    // console.log(plane);
+
+    // plane.frustumCulled = false;
+
+    // plane.up = new THREE.Vector3(0, 1, 0);
+
+    //plane.rotation.z = 0;//3 * Math.PI/4;
+    // console.log("add", plane.rotation);
+    Scene.addObject(plane);
+    old_pos = plane.position;
+    down = true;
+
+    //console.log(plane);
+    // maybe should be mousemove()
+    document.getElementById("canvas").addEventListener("mouseup",  mouseup);
+
+
+    // Scene.addObject(plane);
+
+    //console.log(Scene);
+    // var geometry = new THREE.SphereGeometry( 5, 32, 32 );
+    // var sphere = new THREE.Mesh( geometry, material );
+    // // var position = new THREE.Vector3(x, y, z);
+    // // console.log(sphere);
+    // sphere.position.set(pos.x,pos.y, pos.z);
+    // // console.log(sphere);
+    // Scene.addObject( sphere );
+
+    // var new_Sphere = new THREE.SphereGeometry();
+
+}
+
+function mousemove(event){
+    // event.preventDefault();
+    // event.stopPropagation();
+    var cursor_pos = getCursorPos(event);
+
+
+
+    if (down){
+            // var theta = Math.PI / 4;
+            // plane.up = new THREE.Vector3(.5, .5, 0);
+            // plane.rotation.z -= theta;
+            // down = false;
+        setTimeout(function() {
+            var new_norm = new THREE.Vector3();
+            new_norm.subVectors(cursor_pos, old_pos);
+            // console.log(plane);
+            var theta = Math.acos(plane.up.dot(new_norm) / (plane.up.length() * new_norm.length()));
+
+
+            if (plane.up.clone().cross(new_norm).z < 0){
+                theta *= -1;
+            }
+
+            console.log(theta);
+
+
+            if (!isNaN(theta)){    
+                plane.rotation.z += theta;
+            }
+
+            new_norm.normalize();
+
+            // var points = plane.geometry.attributes.position.array;
+
+            // var point_one = new THREE.Vector3(points[0], points[1], points[2]);
+            // var point_two = new THREE.Vector3(points[3], points[4], points[5]);
+
+            // var vec1 = new THREE.Vector3();
+            // var vec2 = new THREE.Vector3();
+
+            // vec1.subVectors(point_one, plane.position);
+            // vec2.subVectors(point_two, plane.position);
+
+            // var n = new THREE.Vector3();
+            // n.crossVectors(vec1, vec2);
+
+            plane.up = new_norm;
+            // console.log(plane.rotation);
+            //console.log("norm", new_norm);
+            //plane.geometry.computeFacecNormals();
+            //last_up = plane.up;
+        }, 25);
+        
+    }
+
+}
+
+function mouseup(event){
+    // event.preventDefault();
+    // event.stopPropagation();
+    console.log("you released the mouse button");
+    down = false;
+
+    // document.getElementById("canvas").removeEventListener( 'mousemove', mousemove);
+    document.getElementById("canvas").removeEventListener( 'mouseup', mouseup);
+}
