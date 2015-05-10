@@ -82,7 +82,7 @@ Renderer.onWindowResize = function () {
 
 Renderer.update = function () {
 
-    ParticleEngine.step();
+    setTimeout(ParticleEngine.step(), 25);
 
     Renderer._controls.update();
     Renderer._stats.update();

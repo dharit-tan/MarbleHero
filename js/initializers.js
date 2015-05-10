@@ -21,22 +21,47 @@ function SphereInitializer ( opts ) {
     return this;
 };
 
+var once = true;
 SphereInitializer.prototype.initializePositions = function ( positions, toSpawn) {
-    var base = this._opts.sphere;
-    var base_pos = new THREE.Vector3( base.x, base.y, base.z );
-    var r   = base.w;
+    var sphere;
+    var base_pos;
+    var r;
+
+    for (var i = 0 ; i < Scene._objects.length ; ++i ) {
+        if (Scene._objects[i].geometry.type == "SphereGeometry") {
+            sphere = Scene._objects[i];
+            // if (once) {
+            //     once = false;
+            //     console.log(sphere);
+            // }
+            base_pos = sphere.position;
+            r = sphere.geometry.boundingSphere.radius;
+            // console.log(base_pos);
+            // var plane = Scene._objects[i];
+            // Collisions.BounceTrampoline( particleAttributes, alive, delta_t, plane, this._opts.externalForces.trampolineDamping );
+            break;
+        }
+    }
+
+    // var base = this._opts.sphere;
+    // var base_pos = new THREE.Vector3( base.x, base.y, base.z );
+    // var r   = base.w;
     for ( var i = 0 ; i < toSpawn.length ; ++i ) {
         var idx = toSpawn[i];
         // ----------- STUDENT CODE BEGIN ------------
         var z = (1.0 - 2.0 * Math.random()) * r;
         var phi = Math.random() * 2.0 * Math.PI;
         var d = Math.sqrt(r*r - z*z);
-        var px = base.x + d * Math.cos(phi);
-        var py = base.y + d * Math.sin(phi);
-        var pz = base.z + z;
+        var px = sphere.position.x + d * Math.cos(phi);
+        var py = sphere.position.y + d * Math.sin(phi);
+        var pz = sphere.position.z + z;
         var pos = new THREE.Vector3( px,
                                      py,
                                      pz );
+        // console.log("base_pos", base_pos);
+        // console.log("pos", pos);
+
+        // pos = sphere.position;
 
         // ----------- STUDENT CODE END ------------
         setElement( idx, positions, pos );
@@ -46,16 +71,18 @@ SphereInitializer.prototype.initializePositions = function ( positions, toSpawn)
 }
 
 SphereInitializer.prototype.initializeVelocities = function ( velocities, positions, toSpawn ) {
-    var base_vel = this._opts.velocity;
-    var sphere = this._opts.sphere;
-    var center = new THREE.Vector3( sphere.x, sphere.y, sphere.z );
-    var velFact = 10.0;
+    // var base_vel = this._opts.velocity;
+    // var sphere = this._opts.sphere;
+    // var center = new THREE.Vector3( sphere.x, sphere.y, sphere.z );
+    // var velFact = 1.0;
     for ( var i = 0 ; i < toSpawn.length ; ++i ) {
         var idx = toSpawn[i];
         // ----------- STUDENT CODE BEGIN ------------
-        var pos = getElement( idx, positions );
-        var normal = pos.clone().sub(center).normalize();
-        var vel = normal.multiplyScalar(velFact);
+        // var pos = getElement( idx, positions );
+        // var normal = pos.clone().sub(center).normalize();
+        // var vel = normal.multiplyScalar(velFact);
+
+        var vel = new THREE.Vector3(0, 0, 0);
         // ----------- STUDENT CODE END ------------
         setElement( idx, velocities, vel );
     }
@@ -265,6 +292,8 @@ AnimationInitializer.prototype.getMorphedMesh = function () {
 
 
 AnimationInitializer.prototype.initializePositions = function ( positions, toSpawn, mesh ) {
+    if (!mesh) mesh = Scene._objects[0];
+    // console.log("hi");
     for ( var i = 0 ; i < toSpawn.length ; ++i ) {
         // ----------- STUDENT CODE BEGIN ------------
         var faces = mesh.faces;
@@ -276,10 +305,12 @@ AnimationInitializer.prototype.initializePositions = function ( positions, toSpa
         var norm = tri.normal;
         
         // Random point on face surface by bilinear interpolation
-        var ab = b.sub(a).multiplyScalar(Math.random()).add(a);
-        var ac = c.sub(a).multiplyScalar(Math.random()).add(a);
-        var abac = ab.clone().sub(ac).multiplyScalar(Math.random());
-        var interp = ab.add(abac);
+        // var ab = b.sub(a).multiplyScalar(Math.random()).add(a);
+        // var ac = c.sub(a).multiplyScalar(Math.random()).add(a);
+        // var abac = ab.clone().sub(ac).multiplyScalar(Math.random());
+        // var interp = ab.add(abac);
+
+        var interp = new THREE.Vector3(a, b, c);
 
         setElement( i, positions, interp );
         // ----------- STUDENT CODE END ------------
@@ -461,7 +492,6 @@ MyInitializer.prototype.initializePositions = function ( positions, toSpawn) {
     for ( var i = 0 ; i < toSpawn.length ; ++i ) {
         var idx = toSpawn[i];
         setElement( idx, positions, base_pos.clone() );
-
     }
     positions.needUpdate = true;
 }
@@ -522,16 +552,19 @@ MyInitializer.prototype.initializeLifetimes = function ( lifetimes, toSpawn ) {
     lifetimes.needUpdate = true;
 }
 
+var toggle = false;
 MyInitializer.prototype.initialize = function ( particleAttributes, toSpawn, width, height ) {
+    if (!toggle){
+        // update required values
+        this.initializePositions( particleAttributes.position, toSpawn, width, height );
 
-    // update required values
-    this.initializePositions( particleAttributes.position, toSpawn, width, height );
+        this.initializeVelocities( particleAttributes.velocity, particleAttributes.position, toSpawn );
 
-    this.initializeVelocities( particleAttributes.velocity, particleAttributes.position, toSpawn );
+        this.initializeColors( particleAttributes.color, toSpawn );
 
-    this.initializeColors( particleAttributes.color, toSpawn );
+        this.initializeLifetimes( particleAttributes.lifetime, toSpawn );
 
-    this.initializeLifetimes( particleAttributes.lifetime, toSpawn );
-
-    this.initializeSizes( particleAttributes.size, toSpawn );
+        this.initializeSizes( particleAttributes.size, toSpawn );
+        toggle = true;
+    }
 };

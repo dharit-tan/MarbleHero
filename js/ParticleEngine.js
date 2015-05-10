@@ -113,6 +113,7 @@ function Emitter ( opts ) {
     this._initializer          = undefined;
     this._updater              = undefined;
     this._cloth                = false;
+    this._sphere               = false;
     this._width                = undefined;
     this._height               = undefined;
     // this._radius               = undefined;
@@ -142,6 +143,8 @@ function Emitter ( opts ) {
             this._material = value;
         } else if ( option === "cloth" ) {
             this._cloth = value;
+        } else if ( option === "sphere" ) {
+            this._sphere = value;
         } else if ( option === "width" ) {
             this._width = value;
         } else if ( option === "height" ) {
@@ -218,13 +221,13 @@ function Emitter ( opts ) {
     // Create the drawable particles - this is the object that three.js will use to draw stuff onto screen
     if ( this._cloth === true ) {
         this._drawableParticles = new THREE.Mesh( this._particles, this._material );
-    } else {
-        // this._drawableParticles = new THREE.PointCloud( this._particles, this._material );
-
+    } else if (this._sphere === true) {
         // Make particles a sphere
         var sphere_geo = new THREE.SphereGeometry( this._attributeInformation.radius, 100, 100 );
         var phong      = new THREE.MeshPhongMaterial( {color: 0x444444, emissive:0x442222, side: THREE.DoubleSide } );
         this._drawableParticles = new THREE.Mesh( sphere_geo, phong );
+    } else {
+        this._drawableParticles = new THREE.PointCloud( this._particles, this._material );
     }
 
     return this;
@@ -233,9 +236,7 @@ function Emitter ( opts ) {
 Emitter.prototype.restart = function() {
 
     for ( var i = 0 ; i < this._maxParticleCount ; ++i ) {
-
         this._initialized[i] = 0;
-
     }
 
     for ( var attributeKey in this._particleAttributes ) {
@@ -255,10 +256,14 @@ Emitter.prototype.restart = function() {
     }
 }
 
+var i = 0
 Emitter.prototype.update = function( delta_t ) {
     // how many particles should we add?
     var toAdd = Math.floor( delta_t * this._particlesPerSecond );
-
+    if (i < 20) {
+        console.log(this);
+        i++;
+    }
     if ( toAdd > 0 ) {
         this._initializer.initialize ( this._particleAttributes, this.getSpawnable( toAdd ), this._width, this._height );
     }
@@ -272,10 +277,10 @@ Emitter.prototype.update = function( delta_t ) {
     }
 
     // for visibility culling
-    var positions = this._particleAttributes.position;
-    var pos = getElement(0, positions);
-    this._drawableParticles.position.set(pos.x, pos.y, pos.z);
-    // this._drawableParticles.geometry.computeBoundingSphere();
+    // var positions = this._particleAttributes.position;
+    // var pos = getElement(0, positions);
+    // this._drawableParticles.position.set(pos.x, pos.y, pos.z);
+    this._drawableParticles.geometry.computeBoundingSphere();
 
     // particle position change each frame so we need
     if ( this._cloth === true ) {
