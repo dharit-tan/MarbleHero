@@ -13,6 +13,7 @@ var Renderer = Renderer || {
     _width      : undefined,
     _height     : undefined,
     _aspect     : undefined,
+    _pause      : false,
 
 };
 
@@ -79,6 +80,7 @@ Renderer.onWindowResize = function () {
     Renderer._renderer.setSize( Renderer._width, Renderer._height );
 };
 
+// var toggle = true;
 
 Renderer.update = function () {
 
@@ -91,6 +93,25 @@ Renderer.update = function () {
 
 
     requestAnimationFrame( Renderer.update );
+
+    // if (toggle){
+    //     console.log(Scene._objects[2]);
+    //     toggle = false;
+    // }
+
+    var mesh = Scene._objects[2];
+    // console.log(mesh.material.map.);
+    var texture = mesh.material.map;
+    var imageContext = texture.image.getContext('2d');
+
+    if ( video.readyState === video.HAVE_ENOUGH_DATA) {
+
+        imageContext.drawImage( video, 0, 0 );
+
+        texture.needsUpdate = true;
+
+    }
+
 
 }
 
@@ -121,5 +142,6 @@ window.addEventListener( 'keyup', function( event ) {
     // only respond to 'Spacebar' key
     if ( event.which == 32 ) {
         ParticleEngine.pause();
+        Renderer._pause = true;
     }
 });

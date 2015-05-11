@@ -261,7 +261,7 @@ Emitter.prototype.update = function( delta_t ) {
     // how many particles should we add?
     var toAdd = Math.floor( delta_t * this._particlesPerSecond );
     if (i < 20) {
-        console.log(this);
+        // console.log(this);
         i++;
     }
     if ( toAdd > 0 ) {

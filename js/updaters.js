@@ -34,16 +34,18 @@ var once = true;
 //     }
 // };
 var score = 0;
+var once = true;
+
 
 Collisions.BounceTrampoline = function ( particleAttributes, alive, delta_t, plane, damping ) {
     var positions    = particleAttributes.position;
     var velocities   = particleAttributes.velocity;
 
     for ( var i = 0 ; i < alive.length ; ++i ) {
-        // if (i == 0 && once==true){     
-        //     console.log("plane", plane); 
-        //     // once = false;
-        // }
+        if (i == 0 && once==true){     
+            // console.log("plane", plane); 
+            // once = false;
+        }
         if ( !alive[i] ) continue;
         // http://mathworld.wolfram.com/Point-PlaneDistance.html
         var pos = getElement( i, positions );
@@ -64,7 +66,9 @@ Collisions.BounceTrampoline = function ( particleAttributes, alive, delta_t, pla
         
         var radius = 5;
         var dist = pos.distanceTo(point_on);
+
         if (projw_onn < radius + EPS && dist < plane.geometry.parameters.width/2.0) {
+
             vel.reflect(n).multiplyScalar(damping);
             Score.updateScore(score += 10);
         }
@@ -235,8 +239,9 @@ EulerUpdater.prototype.updateVelocities = function ( particleAttributes, alive, 
     var positions = particleAttributes.position;
     var velocities = particleAttributes.velocity;
     var gravity = this._opts.externalForces.gravity;
-    var gravityAttenuation = 0.3;
+    var gravityAttenuation = 1;
     var attractors = this._opts.externalForces.attractors;
+    var weakGravMult = 100.0;
 
     // console.log(attractors);
 
@@ -247,19 +252,31 @@ EulerUpdater.prototype.updateVelocities = function ( particleAttributes, alive, 
         var v = getElement( i, velocities );
         // now update velocity based on forces...
 
+        // gravity around moving sphere
+        var s = Scene._objects[0].geometry.boundingSphere;
+        var sPos = Scene._objects[0].position.clone();
+        var f = new THREE.Vector3(0.0, 0.0, 0.0);
+        f.subVectors(sPos, p).normalize();// f.subVectors(s.center, p).normalize();
+        // var falloff = s.radius / (p.distanceTo(sPos));
+        v.add(f.multiplyScalar(weakGravMult));
+        
         // attractors
         for (var j = 0; j < attractors.length; j++) {
-            var s = attractors[j];
+            var a = attractors[j];
             var f = new THREE.Vector3(0.0, 0.0, 0.0);
-            f.subVectors(s.center, p).normalize();
-            var falloff = s.radius / (p.distanceTo(s.center));
+            f.subVectors(a.center, p).normalize();
+            var falloff = a.radius / (p.distanceTo(a.center));
             v.add(f.multiplyScalar(falloff));
         }
+        
+
+
+        //}
 
         // gravity
         v.add(gravity.clone().multiplyScalar(delta_t * gravityAttenuation));
 
-        v = new THREE.Vector3(0, 0, 0);
+        //v = new THREE.Vector3(0, 0, 0);
         setElement( i, velocities, v );
         // ----------- STUDENT CODE END ------------
     }
@@ -267,14 +284,20 @@ EulerUpdater.prototype.updateVelocities = function ( particleAttributes, alive, 
 
 EulerUpdater.prototype.updateColors = function ( particleAttributes, alive, delta_t ) {
     var colors    = particleAttributes.color;
+    var positions    = particleAttributes.position;
 
     for ( var i = 0 ; i < alive.length ; ++i ) {
 
         if ( !alive[i] ) continue;
         // ----------- STUDENT CODE BEGIN ------------
-        var c = getElement( i, colors );
+        var pos = getElement( i, positions );
+        var x = Math.abs(pos.x/10);
+        var y = Math.abs(pos.y/10);
+        var z = Math.abs(pos.z/10);
+        var col = new THREE.Vector4(Math.sin(x), Math.sin(y), Math.sin(z), 1);
+      
 
-        setElement( i, colors, c );
+        setElement( i, colors, col );
         // ----------- STUDENT CODE END ------------
     }
 };
@@ -317,34 +340,43 @@ EulerUpdater.prototype.collisions = function ( particleAttributes, alive, delta_
     if ( !this._opts.collidables ) {
         return;
     }
-    if ( this._opts.collidables.bouncePlanes ) {
-        for (var i = 0 ; i < this._opts.collidables.bouncePlanes.length ; ++i ) {
-            var plane = this._opts.collidables.bouncePlanes[i].plane;
-            var damping = this._opts.collidables.bouncePlanes[i].damping;
-            Collisions.BouncePlane( particleAttributes, alive, delta_t, plane, damping );
-        }
+    for (var i = 0 ; i < Scene._objects.length ; ++i ) {
+         
+        // if (Scene._objects[i].geometry.type == "PlaneBufferGeometry") {
+        //     //console.log(Scene._objects[i].name);
+        //     var plane = Scene._objects[i];
+        //     Collisions.BounceTrampoline( particleAttributes, alive, delta_t, plane, this._opts.externalForces.trampolineDamping );
+        // }
+       
     }
+    // if ( this._opts.collidables.bouncePlanes ) {
+    //     for (var i = 0 ; i < this._opts.collidables.bouncePlanes.length ; ++i ) {
+    //         var plane = this._opts.collidables.bouncePlanes[i].plane;
+    //         var damping = this._opts.collidables.bouncePlanes[i].damping;
+    //         Collisions.BouncePlane( particleAttributes, alive, delta_t, plane, damping );
+    //     }
+    // }
 
-    if ( this._opts.collidables.sinkPlanes ) {
-        for (var i = 0 ; i < this._opts.collidables.sinkPlanes.length ; ++i ) {
-            var plane = this._opts.collidables.sinkPlanes[i].plane;
-            Collisions.SinkPlane( particleAttributes, alive, delta_t, plane );
-        }
-    }
+    // if ( this._opts.collidables.sinkPlanes ) {
+    //     for (var i = 0 ; i < this._opts.collidables.sinkPlanes.length ; ++i ) {
+    //         var plane = this._opts.collidables.sinkPlanes[i].plane;
+    //         Collisions.SinkPlane( particleAttributes, alive, delta_t, plane );
+    //     }
+    // }
 
-    if ( this._opts.collidables.spheres ) {
-        for (var i = 0 ; i < this._opts.collidables.spheres.length ; ++i ) {
-            Collisions.Sphere( particleAttributes, alive, delta_t, this._opts.collidables.spheres[i] );
-        }
-    }
+    // if ( this._opts.collidables.spheres ) {
+    //     for (var i = 0 ; i < this._opts.collidables.spheres.length ; ++i ) {
+    //         Collisions.Sphere( particleAttributes, alive, delta_t, this._opts.collidables.spheres[i] );
+    //     }
+    // }
 
-    if ( this._opts.collidables.bounceBoxes ) {
-        for (var i = 0 ; i < this._opts.collidables.bounceBoxes.length ; ++i ) {
-            var box = this._opts.collidables.bounceBoxes[i].box;
-            var damping = this._opts.collidables.bounceBoxes[i].damping;
-            Collisions.BounceBox( particleAttributes, alive, delta_t, box, damping );
-        }
-    }
+    // if ( this._opts.collidables.bounceBoxes ) {
+    //     for (var i = 0 ; i < this._opts.collidables.bounceBoxes.length ; ++i ) {
+    //         var box = this._opts.collidables.bounceBoxes[i].box;
+    //         var damping = this._opts.collidables.bounceBoxes[i].damping;
+    //         Collisions.BounceBox( particleAttributes, alive, delta_t, box, damping );
+    //     }
+    // }
 };
 
 EulerUpdater.prototype.update = function ( particleAttributes, alive, delta_t ) {
@@ -518,7 +550,7 @@ MyUpdater.prototype.updatePositions = function ( particleAttributes, alive, delt
     for (var i = 0 ; i < Scene._objects.length ; ++i ) {
         if (Scene._objects[i].geometry.type == "SphereGeometry") {
             var sphere = Scene._objects[i];
-            console.log(sphere);
+            // console.log(sphere);
             sphere.position.set(p.x, p.y, p.z);
             break;
         }
@@ -626,6 +658,7 @@ MyUpdater.prototype.collisions = function ( particleAttributes, alive, delta_t )
     for (var i = 0 ; i < Scene._objects.length ; ++i ) {
          
         if (Scene._objects[i].geometry.type == "PlaneBufferGeometry") {
+            // ollid
             var plane = Scene._objects[i];
             Collisions.BounceTrampoline( particleAttributes, alive, delta_t, plane, this._opts.externalForces.trampolineDamping );
         }
