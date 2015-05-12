@@ -384,6 +384,7 @@ createCoins = function(width, height) {
     }
 };
 
+// http://stackoverflow.com/questions/12438674/three-js-multiple-material-plane
 checkerboard = function(geometry) {
     // assign a material to each face (each face is 2 triangles)
     var l = geometry.faces.length / 2;
@@ -410,7 +411,7 @@ SystemSettings.mySystem = {
         // length: 1000,
         color:    new THREE.Vector4 ( 0.91, 0.23, 0.1, 1.0 ),
         velocity: new THREE.Vector3 ( 0.0, 0.0, 0.0),
-        lifetime: 1000,
+        lifetime: 10000,
         size:     2.0,
     },
 
