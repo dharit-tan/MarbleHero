@@ -486,10 +486,16 @@ SystemSettings.mySystem = {
         var topPlane_geo = new THREE.PlaneGeometry(480, 10000, 10, 100);
         var topPlane = new THREE.Mesh( topPlane_geo, wallMaterials );
         checkerboard(topPlane_geo);
-        topPlane.position.y = height/2;
-        topPlane.rotation.x = Math.PI/2.0;
         topPlane.name = "Boundary";
         topPlane.bounce = bounce;
+        topPlane.up = new THREE.Vector3(0, 1, 0);
+        // var topneg_plane = new THREE.Mesh( topPlane_geo, material );
+        // topneg_plane.name = "Trampoline";
+        // topneg_plane.bounce = bounce;
+        // topneg_plane.up = new THREE.Vector3(0, -1, 0);
+        // topPlane.add(topneg_plane);
+        topPlane.position.y = height/2;
+        topPlane.rotation.x = Math.PI/2.0;
 
         var botPlane_geo = new THREE.PlaneGeometry(480, 10000, 10, 100);
         checkerboard(botPlane_geo);

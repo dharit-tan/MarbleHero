@@ -137,12 +137,12 @@ function mousedown(event) {
     var cursor_pos = getCursorPos(event);
     var plane_geo = new THREE.PlaneBufferGeometry(30,30,10,5);
     plane     = new THREE.Mesh( plane_geo, material );
-    neg_plane = new THREE.Mesh( plane_geo, material );
     plane.name = "Trampoline";
-    neg_plane.name = "Trampoline";
     plane.bounce = 1;
-    neg_plane.bounce = 1;
     plane.up     = new THREE.Vector3(0, 1, 0);
+    neg_plane = new THREE.Mesh( plane_geo, material );
+    neg_plane.name = "Trampoline";
+    neg_plane.bounce = 1;
     neg_plane.up = new THREE.Vector3(0, -1, 0);
     plane.add(neg_plane);
     if (once) {
@@ -172,7 +172,7 @@ function mousedown(event) {
     Scene.addObject(plane);
 }
 
-cap = function(input, min, max) {
+clamp = function(input, min, max) {
     if (input < min) {
         return min;
     } else if (input > max) {

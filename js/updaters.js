@@ -41,7 +41,6 @@ Collisions.BounceTrampoline = function ( particleAttributes, alive, delta_t, pla
     var velocities   = particleAttributes.velocity;
     var bounceMult   = 0.5;
 
-    // console.log(plane.bounce);
 
     for ( var i = 0 ; i < alive.length ; ++i ) {
         if ( !alive[i] ) continue;
@@ -63,7 +62,9 @@ Collisions.BounceTrampoline = function ( particleAttributes, alive, delta_t, pla
 
         if (projw_onn < radius + EPS && dist < plane.geometry.parameters.width/2.0) {
             if (plane.bounce !== undefined) {
-                pos.add(n.clone().multiplyScalar(radius + EPS - dist));
+                if (plane.name === "Trampoline")
+                    pos.add(n.clone().normalize().multiplyScalar(radius + EPS - dist));
+                // pos.add(n.clone().normalize().multiplyScalar(radius + EPS - dist));
                 vel.reflect(n).multiplyScalar(plane.bounce * bounceMult);
             }
             else
