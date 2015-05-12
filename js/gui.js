@@ -81,6 +81,7 @@ Gui.init = function ( meshChangeCallback, controlsChangeCallback, displayChangeC
     gc.depthTest = disp.add( Gui.values, 'depthTest' ).name("Depth Test");
     gc.transp    = disp.add( Gui.values, 'transparent' ).name("Transparent");
     gc.sort      = disp.add( Gui.values, 'sorting' ).name("Sorting");
+    gui.destroy();
 
     // REGISTER CALLBACKS FOR WHEN GUI CHANGES:
     size.onChange( Renderer.onWindowResize );

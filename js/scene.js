@@ -26,7 +26,7 @@ Scene.setupLighting = function() {
     var light = new THREE.AmbientLight( 0x303030 ); // soft white light
 
     this._light    = new THREE.PointLight( 0xffffff, 2.0, 500.0 );
-    this._light .position.set( 0, 250, 0 );
+    this._light.position.set( 0, 250, 0 );
 
     // Scene._scene.add( light );
     Scene._scene.add( this._light  );
@@ -36,7 +36,6 @@ Scene.setupLighting = function() {
 Scene.setupMaterials = function() {
     var default_mat = new THREE.MeshLambertMaterial( { color : 0x555555 } );
     Scene._materials.push( default_mat );
-
 };
 
 Scene.getDefaultMaterial = function() {

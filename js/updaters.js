@@ -10,6 +10,7 @@
 var Collisions = Collisions || {};
 var EPS = 0.0001;
 var once = true;
+var score = 0;
 
 // Collisions.BouncePlane = function ( particleAttributes, alive, delta_t, plane,damping ) {
 //     var positions    = particleAttributes.position;
@@ -33,21 +34,17 @@ var once = true;
 //         // ----------- STUDENT CODE END ------------
 //     }
 // };
-var score = 0;
-var once = true;
 
-
-Collisions.BounceTrampoline = function ( particleAttributes, alive, delta_t, plane, damping ) {
+// http://mathworld.wolfram.com/Point-PlaneDistance.html
+Collisions.BounceTrampoline = function ( particleAttributes, alive, delta_t, plane, radius ) {
     var positions    = particleAttributes.position;
     var velocities   = particleAttributes.velocity;
+    var bounceMult   = 0.5;
+
+    console.log(plane.bounce * bounceMult);
 
     for ( var i = 0 ; i < alive.length ; ++i ) {
-        if (i == 0 && once==true){     
-            // console.log("plane", plane); 
-            // once = false;
-        }
         if ( !alive[i] ) continue;
-        // http://mathworld.wolfram.com/Point-PlaneDistance.html
         var pos = getElement( i, positions );
         var vel = getElement( i, velocities );
 
@@ -56,27 +53,53 @@ Collisions.BounceTrampoline = function ( particleAttributes, alive, delta_t, pla
         var w = new THREE.Vector3();
         w.subVectors(point_on, pos);
 
-        // vector n = normal of plane 
         var n = plane.up;
-        // n.normalize();
         
         // projection of w onto n is distance from pos to plane
         var projw_onn = w.dot(n);
         projw_onn = Math.abs(projw_onn);
         
-        var radius = 5;
         var dist = pos.distanceTo(point_on);
 
         if (projw_onn < radius + EPS && dist < plane.geometry.parameters.width/2.0) {
-
-            vel.reflect(n).multiplyScalar(damping);
-            Score.updateScore(score += 10);
+            if (plane.bounce !== undefined)
+                vel.reflect(n).multiplyScalar(plane.bounce * bounceMult);
+            else
+                vel.reflect(n).multiplyScalar(1);
+            // Score.updateScore(score += 10);
         }
 
         setElement( i, positions, pos );
         setElement( i, velocities, vel );
     }
 };
+
+var coinScore = 10;
+var winScore = 200;
+Collisions.BounceCoin = function ( particleAttributes, alive, delta_t, coin, radius ) {
+    var positions    = particleAttributes.position;
+    var velocities   = particleAttributes.velocity;
+
+    for ( var i = 0 ; i < alive.length ; ++i ) {
+        if ( !alive[i] ) continue;
+        var pos = getElement( i, positions );
+        var vel = getElement( i, velocities );
+        var center = new THREE.Vector3(coin.position.x, coin.position.y, coin.position.z);
+        var coinRadius = coin.geometry.boundingSphere.radius;
+        
+        var d = pos.distanceTo(center) - radius - coinRadius;
+        if (d < EPS) {
+            Score.updateScore(score += coinScore);
+            Scene.removeObject(coin);
+            coin.name = undefined;
+        }
+
+        if (score >= winScore) {
+            ParticleEngine.stop();
+            Gui.alertOnce('YOU WIN! 8====D YAY!');
+        }
+    }
+}
 
 // Collisions.SinkPlane = function ( particleAttributes, alive, delta_t, plane  ) {
 //     var positions   = particleAttributes.position;
@@ -340,7 +363,7 @@ EulerUpdater.prototype.collisions = function ( particleAttributes, alive, delta_
     if ( !this._opts.collidables ) {
         return;
     }
-    for (var i = 0 ; i < Scene._objects.length ; ++i ) {
+    // for (var i = 0 ; i < Scene._objects.length ; ++i ) {
          
         // if (Scene._objects[i].geometry.type == "PlaneBufferGeometry") {
         //     //console.log(Scene._objects[i].name);
@@ -348,7 +371,7 @@ EulerUpdater.prototype.collisions = function ( particleAttributes, alive, delta_
         //     Collisions.BounceTrampoline( particleAttributes, alive, delta_t, plane, this._opts.externalForces.trampolineDamping );
         // }
        
-    }
+    // }
     // if ( this._opts.collidables.bouncePlanes ) {
     //     for (var i = 0 ; i < this._opts.collidables.bouncePlanes.length ; ++i ) {
     //         var plane = this._opts.collidables.bouncePlanes[i].plane;
@@ -652,29 +675,31 @@ MyUpdater.prototype.updateLifetimes = function ( particleAttributes, alive, delt
 };
 
 MyUpdater.prototype.collisions = function ( particleAttributes, alive, delta_t ) {
-    if ( !this._opts.collidables ) {
-        return;
-    }
+    // if ( !this._opts.collidables ) {
+    //     return;
+    // }
     for (var i = 0 ; i < Scene._objects.length ; ++i ) {
-         
-        if (Scene._objects[i].geometry.type == "PlaneBufferGeometry") {
-            // ollid
+        if (Scene._objects[i].name === "Trampoline" || Scene._objects[i].name == "Boundary") {
             var plane = Scene._objects[i];
-            Collisions.BounceTrampoline( particleAttributes, alive, delta_t, plane, this._opts.externalForces.trampolineDamping );
-        }
+            Collisions.BounceTrampoline( particleAttributes, alive, delta_t, plane, this._opts.radius );
+        }        
+        if (Scene._objects[i].name === "Coin") {
+            var coin = Scene._objects[i];
+            Collisions.BounceCoin( particleAttributes, alive, delta_t, coin, this._opts.radius );
+        }        
         // if (Scene._objects[i].geometry.type == "SphereGeometry") {
-            // var sphere = Scene._objects[i].geometry;
-            // sphere.position.set()
-            // console.log(i);
-            // var plane = Scene._objects[i];
-            // Collisions.BounceTrampoline( particleAttributes, alive, delta_t, plane, this._opts.externalForces.trampolineDamping );
+        //     var sphere = Scene._objects[i].geometry;
+        //     sphere.position.set()
+        //     console.log(i);
+        //     var plane = Scene._objects[i];
+        //     Collisions.BounceTrampoline( particleAttributes, alive, delta_t, plane, this._opts.externalForces.trampolineDamping );
         // }
     }
-        // for (var i = 0 ; i < this._opts.collidables.bouncePlanes.length ; ++i ) {
-        //     var plane = this._opts.collidables.bouncePlanes[i].plane;
-        //     var damping = this._opts.collidables.bouncePlanes[i].damping;
-        //     Collisions.BouncePlane( particleAttributes, alive, delta_t, plane, damping );
-        // }
+    // for (var i = 0 ; i < this._opts.collidables.bouncePlanes.length ; ++i ) {
+    //     var plane = this._opts.collidables.bouncePlanes[i].plane;
+    //     var damping = this._opts.collidables.bouncePlanes[i].damping;
+    //     Collisions.BouncePlane( particleAttributes, alive, delta_t, plane, damping );
+    // }
 
     // if ( this._opts.collidables.sinkPlanes ) {
     //     for (var i = 0 ; i < this._opts.collidables.sinkPlanes.length ; ++i ) {
@@ -689,13 +714,13 @@ MyUpdater.prototype.collisions = function ( particleAttributes, alive, delta_t )
     //     }
     // }
 
-    if ( this._opts.collidables.bounceBoxes ) {
-        for (var i = 0 ; i < this._opts.collidables.bounceBoxes.length ; ++i ) {
-            var box = this._opts.collidables.bounceBoxes[i].box;
-            var damping = this._opts.collidables.bounceBoxes[i].damping;
-            Collisions.BounceBox( particleAttributes, alive, delta_t, box, damping );
-        }
-    }
+    // if ( this._opts.collidables.bounceBoxes ) {
+    //     for (var i = 0 ; i < this._opts.collidables.bounceBoxes.length ; ++i ) {
+    //         var box = this._opts.collidables.bounceBoxes[i].box;
+    //         var damping = this._opts.collidables.bounceBoxes[i].damping;
+    //         Collisions.BounceBox( particleAttributes, alive, delta_t, box, damping );
+    //     }
+    // }
 };
 
 MyUpdater.prototype.update = function ( particleAttributes, alive, delta_t ) {
@@ -715,5 +740,4 @@ MyUpdater.prototype.update = function ( particleAttributes, alive, delta_t ) {
     particleAttributes.velocity.needsUpdate = true;
     particleAttributes.lifetime.needsUpdate = true;
     particleAttributes.size.needsUpdate = true;
-
 }

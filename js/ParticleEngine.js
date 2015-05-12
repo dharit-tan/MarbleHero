@@ -116,14 +116,13 @@ function Emitter ( opts ) {
     this._sphere               = false;
     this._width                = undefined;
     this._height               = undefined;
-    // this._radius               = undefined;
+    this._radius               = undefined;
     this._attributeInformation = {
         position:      3,
         velocity:      3,
         color:         4,
         size:          1,
         lifetime:      1,
-        radius:        5,
     };
 
     // parse options
@@ -149,8 +148,8 @@ function Emitter ( opts ) {
             this._width = value;
         } else if ( option === "height" ) {
             this._height = value;
-        // } else if ( option === "radius" ) {
-        //     this._radius = value;
+        } else if ( option === "radius" ) {
+            this._radius = value;
         } else {
             console.log( "Unknown option " + option + "! Make sure to register it!" )
         }
@@ -223,9 +222,10 @@ function Emitter ( opts ) {
         this._drawableParticles = new THREE.Mesh( this._particles, this._material );
     } else if (this._sphere === true) {
         // Make particles a sphere
-        var sphere_geo = new THREE.SphereGeometry( this._attributeInformation.radius, 100, 100 );
-        var phong      = new THREE.MeshPhongMaterial( {color: 0x444444, emissive:0x442222, side: THREE.DoubleSide } );
+        var sphere_geo = new THREE.SphereGeometry( this._radius, 100, 100 );
+        var phong      = new THREE.MeshPhongMaterial( {color: 0x7CFC00, emissive:0xDC143C, side: THREE.DoubleSide } );
         this._drawableParticles = new THREE.Mesh( sphere_geo, phong );
+        // this._drawableParticles.name = "Hero";
     } else {
         this._drawableParticles = new THREE.PointCloud( this._particles, this._material );
     }

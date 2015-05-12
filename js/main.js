@@ -36,7 +36,7 @@ Main.particleSystemChangeCallback = function ( InputSettings ) {
         width:         InputSettings.width,
         height:        InputSettings.height,
         // Radius of particle is in ParticleEngine this._attributeInformation 
-        //radius:        InputSettings.radius, 
+        radius:        InputSettings.radius, 
     } );
 
     // If we are not dealing with cloth, lets sort particles
@@ -59,7 +59,7 @@ Main.particleSystemChangeCallback = function ( InputSettings ) {
         width:         InputSettings.width,
         height:        InputSettings.height,
         // Radius of particle is in ParticleEngine this._attributeInformation 
-        //radius:        InputSettings.radius, 
+        // radius:        InputSettings.radius, 
     } );
 
     // If we are not dealing with cloth, lets sort particles
@@ -105,10 +105,10 @@ window.onload = function() {
     Renderer.update();
 };
 
-//http://stackoverflow.com/questions/13055214/mouse-canvas-x-y-to-three-js-world-x-y-z 
+// http://stackoverflow.com/questions/13055214/mouse-canvas-x-y-to-three-js-world-x-y-z 
 function getCursorPos(event){
-    
     var vector = new THREE.Vector3();
+
     // for perspective camera
     var camera = Renderer._camera;
     vector.set(
@@ -120,33 +120,25 @@ function getCursorPos(event){
     var dir = vector.sub( camera.position ).normalize();
     var distance = - camera.position.z / dir.z;
     var cursor_pos = camera.position.clone().add( dir.multiplyScalar( distance ) );
-    
-    console.log("clientX", event.clientX);
-    console.log("clientY", event.clientY);
-
-    console.log("cursor_pos", cursor_pos);
-    
     return cursor_pos;
 }
 
 var plane, neg_plane;
 var old_clientX, old_clientY;
-
-var last_up = new THREE.Vector3(0,1,0);
-
 var down = false;
 
 function mousedown(event) {
-    // event.preventDefault();
-    // event.stopPropagation();
     console.log("you pressed the mouse button");
     var material = new THREE.MeshBasicMaterial( {color: 0xffffff} );
 
     var cursor_pos = getCursorPos(event);
-
-    var plane_geo = new THREE.PlaneBufferGeometry(30,30,10,5);//THREE.PlaneBufferGeometry( 30, 2, 10, 1 );
+    var plane_geo = new THREE.PlaneBufferGeometry(30,30,10,5);
     plane     = new THREE.Mesh( plane_geo, material );
     neg_plane = new THREE.Mesh( plane_geo, material );
+    plane.name = "Trampoline";
+    neg_plane.name = "Trampoline";
+    plane.bounce = 1;
+    neg_plane.bounce = 1;
     plane.up     = new THREE.Vector3(0, 1, 0);
     neg_plane.up = new THREE.Vector3(0, -1, 0);
     plane.add(neg_plane);
@@ -163,54 +155,25 @@ function mousedown(event) {
         neg_plane.rotation.x = -Math.PI;
     }
 
-    // plane.frustumCulled = false;
-
-    // Scene.addObject(plane);
-    // old_pos = plane.position;
     old_clientX = event.clientX;
     old_clientY = event.clientY;
     down = true;
 
-    //console.log(plane);
     // maybe should be mousemove()
     document.getElementById("canvas").addEventListener("mouseup",  mouseup);
 
-
     Scene.addObject(plane);
-
-    //console.log(Scene);
-    // var geometry = new THREE.SphereGeometry( 5, 32, 32 );
-    // var sphere = new THREE.Mesh( geometry, material );
-    // // var position = new THREE.Vector3(x, y, z);
-    // // console.log(sphere);
-    // sphere.position.set(pos.x,pos.y, pos.z);
-    // // console.log(sphere);
-    // Scene.addObject( sphere );
-
-    // var new_Sphere = new THREE.SphereGeometry();
-
 }
 
 function mousemove(event){
-    // event.preventDefault();
-    // event.stopPropagation();
-    // var cursor_pos = getCursorPos(event);
+    var timeout = 25;
     if (down){
-            // var theta = Math.PI / 4;
-            // plane.up = new THREE.Vector3(.5, .5, 0);
-            // plane.rotation.z -= theta;
-            // down = false;
         setTimeout(function() {
-            // var new_norm = new THREE.Vector3();
-            // new_norm.subVectors(cursor_pos, old_pos);
             var norm = new THREE.Vector3(event.clientX - old_clientX, old_clientY - event.clientY , 0);
+            plane.bounce = norm.length();
+
             norm.normalize();
             var theta = Math.acos(plane.up.dot(norm) / (plane.up.length() * norm.length()));
-
-            console.log("old clientX", old_clientX);
-            console.log("old clientY", old_clientY);
-            console.log("clientX", event.clientX);
-            console.log("clientY", event.clientY);
 
             if (plane.position.y > 0) {
                 if (plane.up.clone().cross(norm).z < 0){
@@ -226,33 +189,12 @@ function mousemove(event){
             if (!isNaN(theta)){    
                 plane.rotation.y += theta;
                 plane.up = norm;
-                // neg_plane.up = norm.clone().negate();
             }
-
-            // var points = plane.geometry.attributes.position.array;
-            // var point_one = new THREE.Vector3(points[0], points[1], points[2]);
-            // var point_two = new THREE.Vector3(points[3], points[4], points[5]);
-            // var vec1 = new THREE.Vector3();
-            // var vec2 = new THREE.Vector3();
-            // vec1.subVectors(point_one, plane.position);
-            // vec2.subVectors(point_two, plane.position);
-            // var n = new THREE.Vector3();
-            // n.crossVectors(vec1, vec2);
-
-            
-            // console.log(plane.rotation);
-            //console.log("norm", norm);
-            //plane.geometry.computeFacecNormals();
-            //last_up = plane.up;
-        }, 25);
-        
+        }, timeout);
     }
-
 }
 
 function mouseup(event){
-    // event.preventDefault();
-    // event.stopPropagation();
     console.log("you released the mouse button");
     down = false;
 
