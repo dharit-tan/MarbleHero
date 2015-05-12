@@ -41,7 +41,7 @@ Collisions.BounceTrampoline = function ( particleAttributes, alive, delta_t, pla
     var velocities   = particleAttributes.velocity;
     var bounceMult   = 0.5;
 
-    console.log(plane.bounce * bounceMult);
+    // console.log(plane.bounce);
 
     for ( var i = 0 ; i < alive.length ; ++i ) {
         if ( !alive[i] ) continue;
@@ -62,8 +62,10 @@ Collisions.BounceTrampoline = function ( particleAttributes, alive, delta_t, pla
         var dist = pos.distanceTo(point_on);
 
         if (projw_onn < radius + EPS && dist < plane.geometry.parameters.width/2.0) {
-            if (plane.bounce !== undefined)
+            if (plane.bounce !== undefined) {
+                pos.add(n.clone().multiplyScalar(radius + EPS - dist));
                 vel.reflect(n).multiplyScalar(plane.bounce * bounceMult);
+            }
             else
                 vel.reflect(n).multiplyScalar(1);
             // Score.updateScore(score += 10);
@@ -74,9 +76,9 @@ Collisions.BounceTrampoline = function ( particleAttributes, alive, delta_t, pla
     }
 };
 
-var coinScore = 10;
-var winScore = 200;
-Collisions.BounceCoin = function ( particleAttributes, alive, delta_t, coin, radius ) {
+var coinScore = 10.65;
+var winScore = 426;
+Collisions.Coin = function ( particleAttributes, alive, delta_t, coin, radius ) {
     var positions    = particleAttributes.position;
     var velocities   = particleAttributes.velocity;
 
@@ -89,7 +91,8 @@ Collisions.BounceCoin = function ( particleAttributes, alive, delta_t, coin, rad
         
         var d = pos.distanceTo(center) - radius - coinRadius;
         if (d < EPS) {
-            Score.updateScore(score += coinScore);
+            score += coinScore;
+            Score.updateScore(score.toFixed(2));
             Scene.removeObject(coin);
             coin.name = undefined;
         }
@@ -685,7 +688,7 @@ MyUpdater.prototype.collisions = function ( particleAttributes, alive, delta_t )
         }        
         if (Scene._objects[i].name === "Coin") {
             var coin = Scene._objects[i];
-            Collisions.BounceCoin( particleAttributes, alive, delta_t, coin, this._opts.radius );
+            Collisions.Coin( particleAttributes, alive, delta_t, coin, this._opts.radius );
         }        
         // if (Scene._objects[i].geometry.type == "SphereGeometry") {
         //     var sphere = Scene._objects[i].geometry;

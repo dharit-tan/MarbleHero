@@ -126,7 +126,10 @@ function getCursorPos(event){
 var plane, neg_plane;
 var old_clientX, old_clientY;
 var down = false;
+var sourceColor = new THREE.Color(0xffffff);
+// var destColor = new THREE.Color(0xff0000);
 
+var once = true;
 function mousedown(event) {
     console.log("you pressed the mouse button");
     var material = new THREE.MeshBasicMaterial( {color: 0xffffff} );
@@ -142,7 +145,11 @@ function mousedown(event) {
     plane.up     = new THREE.Vector3(0, 1, 0);
     neg_plane.up = new THREE.Vector3(0, -1, 0);
     plane.add(neg_plane);
-    
+    if (once) {
+        console.log(plane);
+        once = false;
+    }
+
     plane.position.x = cursor_pos.x;
     plane.position.y = cursor_pos.y;
     plane.position.z = cursor_pos.z;
@@ -165,12 +172,24 @@ function mousedown(event) {
     Scene.addObject(plane);
 }
 
+cap = function(input, min, max) {
+    if (input < min) {
+        return min;
+    } else if (input > max) {
+        return max;
+    }
+    return input;
+}
+
 function mousemove(event){
     var timeout = 25;
     if (down){
         setTimeout(function() {
             var norm = new THREE.Vector3(event.clientX - old_clientX, old_clientY - event.clientY , 0);
             plane.bounce = norm.length();
+            var maxLength = 400;
+            plane.material.color.g = 1-(norm.length() / maxLength);
+            plane.material.color.b = 1-(norm.length() / maxLength);
 
             norm.normalize();
             var theta = Math.acos(plane.up.dot(norm) / (plane.up.length() * norm.length()));
