@@ -145,10 +145,10 @@ function mousedown(event) {
     neg_plane.bounce = 1;
     neg_plane.up = new THREE.Vector3(0, -1, 0);
     plane.add(neg_plane);
-    if (once) {
-        console.log(plane);
-        once = false;
-    }
+    // if (once) {
+    //     console.log(plane);
+    //     once = false;
+    // }
 
     plane.position.x = cursor_pos.x;
     plane.position.y = cursor_pos.y;
@@ -168,6 +168,7 @@ function mousedown(event) {
 
     // maybe should be mousemove()
     document.getElementById("canvas").addEventListener("mouseup",  mouseup);
+    document.getElementById("canvas").addEventListener("mouseout",  mouseup);
 
     Scene.addObject(plane);
 }
@@ -219,4 +220,5 @@ function mouseup(event){
 
     // document.getElementById("canvas").removeEventListener( 'mousemove', mousemove);
     document.getElementById("canvas").removeEventListener( 'mouseup', mouseup);
+    document.getElementById("canvas").removeEventListener( 'mouseout', mouseup);
 }
