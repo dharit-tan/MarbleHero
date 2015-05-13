@@ -47,9 +47,7 @@
         }
     </script>
 
-    <video id="video" autoplay style="display:none">
-            <!-- <source src="images/StarRider1983.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'> -->
-    </video>
+
 
 
         <!-- Our program -->
@@ -67,11 +65,17 @@
 
     <script src="js/main.js"> </script>
 
+    <video id="video" autoplay style="display:none">
+            <source src="images/StarRider1983.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+    </video>
+
     <div id="stats"></div>
     <div id="main_div">
         <!-- <h1> <span class="assignment">COS426 Assignment 4<br></span> Particles </h1> -->
         <!-- <h2 id="student"></h2> -->
         <h2 id="score"></h2>
+
+        <h2 id="instructions" style="float:right">How to Play Marble Hero:<br>Click and drag to insert a trampoline<br>Rotate the trampoline by clicking and dragging with your mouse<br>Collect orbs to increase your score<br>Larger orbs are more valuable!</h2>
         <canvas id="canvas"> </canvas>
     </div>
     <div id="alert_div" title="alert"> </div>

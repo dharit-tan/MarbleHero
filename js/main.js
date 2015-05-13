@@ -86,6 +86,7 @@ Main.particleSystemChangeCallback = function ( InputSettings ) {
 // when HTML is finished loading, do this
 window.onload = function() {
     // Student.updateHTML();
+
     Score.updateScore(0);
 
     // Setup renderer, scene and gui
@@ -127,9 +128,14 @@ var plane, neg_plane;
 var old_clientX, old_clientY;
 var down = false;
 var sourceColor = new THREE.Color(0xffffff);
+// var light;
 // var destColor = new THREE.Color(0xff0000);
 
 var once = true;
+
+var trampolineMax = 15;
+var trampolineIndex =0;
+
 function mousedown(event) {
     console.log("you pressed the mouse button");
     var material = new THREE.MeshBasicMaterial( {color: 0xffffff} );
@@ -170,7 +176,14 @@ function mousedown(event) {
     document.getElementById("canvas").addEventListener("mouseup",  mouseup);
     document.getElementById("canvas").addEventListener("mouseout",  mouseup);
 
+    // light    = new THREE.DirectionalLight( 0x5ADFFA, 0.5);
+    // light.position.set( plane.position.x, plane.position.y, plane.position.z );
+
+    plane.receiveShadow = true;
     Scene.addObject(plane);
+    // Scene.addObject(light);
+
+
 }
 
 clamp = function(input, min, max) {
@@ -183,34 +196,41 @@ clamp = function(input, min, max) {
 }
 
 function mousemove(event){
-    var timeout = 25;
+    var timeout = 0;
+
+    
+
+    // Scene._scene.add( light );
     if (down){
-        setTimeout(function() {
-            var norm = new THREE.Vector3(event.clientX - old_clientX, old_clientY - event.clientY , 0);
-            plane.bounce = norm.length();
-            var maxLength = 400;
-            plane.material.color.g = 1-(norm.length() / maxLength);
-            plane.material.color.b = 1-(norm.length() / maxLength);
+        var norm = new THREE.Vector3(event.clientX - old_clientX, old_clientY - event.clientY , 0);
+        plane.bounce = norm.length() + .5;
+        var maxLength = 100;
+        plane.material.color.g = 1 - Math.pow((norm.y / maxLength), 2);
+        console.log(plane);
+        plane.material.color.r = 1 - Math.pow((norm.x / maxLength), 2);
+        //plane.material.color.r = 1-(norm.z / maxLength);
 
-            norm.normalize();
-            var theta = Math.acos(plane.up.dot(norm) / (plane.up.length() * norm.length()));
+        norm.normalize();
+        var theta = Math.acos(plane.up.dot(norm) / (plane.up.length() * norm.length()));
 
-            if (plane.position.y > 0) {
-                if (plane.up.clone().cross(norm).z < 0){
-                    theta *= -1;
-                }
+        if (plane.position.y > 0) {
+            if (plane.up.clone().cross(norm).z < 0){
+                theta *= -1;
             }
-            else if (plane.position.y <= 0) {
-                if (plane.up.clone().cross(norm).z > 0){
-                    theta *= -1;
-                }
+        }
+        else if (plane.position.y <= 0) {
+            if (plane.up.clone().cross(norm).z > 0){
+                theta *= -1;
             }
+        }
 
-            if (!isNaN(theta)){    
-                plane.rotation.y += theta;
-                plane.up = norm;
-            }
-        }, timeout);
+        if (!isNaN(theta)){    
+            plane.rotation.y += theta;
+            plane.up = norm;
+        }
+
+        // light.position.set( plane.position.x + plane.up.x, plane.position.y + plane.up.y, plane.position.z + plane.up.z );
+
     }
 }
 

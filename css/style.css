@@ -94,6 +94,7 @@ h1, h2, h3 {
         1px -1px 1px #000,
         -1px 1px 1px #000,
          1px 1px 1px #000;
+    text-color: rgba(#BEDEFA,#BEDEFA,#BEDEFA,1);
 }
 
 h1 {

@@ -40,11 +40,6 @@ Renderer.create = function( scene, canvas ) {
     Renderer._renderer.setSize( Renderer._width, Renderer._height );
     Renderer._renderer.setClearColor( 0x444444 );//c5e1d7
 
-    // Renderer._renderer.autoClear = false;
-    // window.addEventListener( "resize",    Renderer.onWindowResize, false );
-    // canvas.addEventListener( "mouseup",   Renderer.onMouseUp,      false );
-    // canvas.addEventListener( "mousedown", Renderer.onMouseDown,    false );
-
     document.body.appendChild( Renderer._renderer.domElement );
 
     // Create camera and setup controls

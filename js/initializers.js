@@ -30,22 +30,15 @@ SphereInitializer.prototype.initializePositions = function ( positions, toSpawn)
     for (var i = 0 ; i < Scene._objects.length ; ++i ) {
         if (Scene._objects[i].geometry.type == "SphereGeometry") {
             sphere = Scene._objects[i];
-            // if (once) {
-            //     once = false;
-            //     console.log(sphere);
-            // }
+
             base_pos = sphere.position;
             r = sphere.geometry.boundingSphere.radius;
-            // console.log(base_pos);
-            // var plane = Scene._objects[i];
-            // Collisions.BounceTrampoline( particleAttributes, alive, delta_t, plane, this._opts.externalForces.trampolineDamping );
+
             break;
         }
     }
 
-    // var base = this._opts.sphere;
-    // var base_pos = new THREE.Vector3( base.x, base.y, base.z );
-    // var r   = base.w;
+
     for ( var i = 0 ; i < toSpawn.length ; ++i ) {
         var idx = toSpawn[i];
         // ----------- STUDENT CODE BEGIN ------------
@@ -58,12 +51,7 @@ SphereInitializer.prototype.initializePositions = function ( positions, toSpawn)
         var pos = new THREE.Vector3( px,
                                      py,
                                      pz );
-        // console.log("base_pos", base_pos);
-        // console.log("pos", pos);
 
-        // pos = sphere.position;
-
-        // ----------- STUDENT CODE END ------------
         setElement( idx, positions, pos );
 
     }
@@ -71,16 +59,9 @@ SphereInitializer.prototype.initializePositions = function ( positions, toSpawn)
 }
 
 SphereInitializer.prototype.initializeVelocities = function ( velocities, positions, toSpawn ) {
-    // var base_vel = this._opts.velocity;
-    // var sphere = this._opts.sphere;
-    // var center = new THREE.Vector3( sphere.x, sphere.y, sphere.z );
-    // var velFact = 1.0;
+
     for ( var i = 0 ; i < toSpawn.length ; ++i ) {
         var idx = toSpawn[i];
-        // ----------- STUDENT CODE BEGIN ------------
-        // var pos = getElement( idx, positions );
-        // var normal = pos.clone().sub(center).normalize();
-        // var vel = normal.multiplyScalar(velFact);
 
         var vel = new THREE.Vector3(0, 0, 0);
         // ----------- STUDENT CODE END ------------
